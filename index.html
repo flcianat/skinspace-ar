@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>SkinSpace AR</title>
+    <meta name="description" content="Educational skincare Web AR application to explore products and learn about ingredients in 3D and Augmented Reality." />
+    <meta property="og:title" content="SkinSpace AR" />
+    <meta property="og:description" content="Educational skincare Web AR application to explore products and learn about ingredients in 3D and Augmented Reality." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts: Fraunces & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- A-Frame and AR.js Web AR Core -->
+    <script src="/vendor/aframe.min.js"></script>
+    <script src="/vendor/aframe-ar.js"></script>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/src/styles/main.css" />
+    <link rel="stylesheet" href="/src/styles/components.css" />
+    <link rel="stylesheet" href="/src/styles/responsive.css" />
+  </head>
+  <body>
+
+    <!-- 3-Zone Top Bar Navigation -->
+    <header class="site-header">
+      <div class="container header-container">
+        <!-- Zone 1: Single text element wordmark -->
+        <a href="#home" class="brand-mark">
+          SkinSpace <span>AR</span>
+        </a>
+
+        <!-- Zone 2: Navigation Links -->
+        <nav class="nav-menu" id="nav-menu">
+          <a href="#home" class="nav-link active">Home</a>
+          <a href="#products" class="nav-link">Explore Products</a>
+          <!-- <a href="#ingredients" class="nav-link">Ingredient Lab</a> -->
+          <a href="#about" class="nav-link">About</a>
+         
+        </nav>
+
+        <!-- Zone 3: Primary Actions -->
+        <div class="header-actions">
+         
+         
+          <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle Navigation Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area with SPA Views -->
+    <main class="site-main">
+
+      <!-- ==========================================
+           VIEW 1: HOME
+           ========================================== -->
+      <section class="view-section active" id="view-home">
+        <!-- Hero Section -->
+        <div class="hero-section">
+          <div class="container hero-grid">
+            <div class="hero-content">
+              <div class="hero-eyebrow">Interactive Skincare Web AR</div>
+              <h1 class="hero-headline">Understand your skincare.</h1>
+              <p class="hero-description">
+                Explore skincare products and ingredients through an interactive AR experience.
+                Visualize formulation layers, examine molecular structures, and learn the science behind skin health.
+              </p>
+              <div class="hero-cta-group">
+                <button class="btn-primary" id="hero-explore-btn">
+                  Start Exploring
+                </button>
+                <button class="btn-secondary" id="hero-try-ar-btn">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                    <polyline points="2 17 12 22 22 17"/>
+                    <polyline points="2 12 12 17 22 12"/>
+                  </svg>
+                  Try AR
+                </button>
+              
+              </div>
+            </div>
+
+            <div class="hero-visual-card">
+              <img src="/assets/images/hero_skincare_science.jpg" alt="SkinSpace Laboratory Exploration" />
+           
+            </div>
+          </div>
+        </div>
+
+        <!-- Philosophy: Scan -> Explore -> Understand -->
+        <div class="process-section">
+          <div class="container">
+            <div class="section-header">
+              <span class="section-kicker">The SkinSpace Method</span>
+              <h2 class="section-title">See it. Explore it. Understand it.</h2>
+              <p class="section-subtitle">
+                Clear science without marketing buzzwords. Experience how active ingredients interact with your moisture barrier.
+              </p>
+            </div>
+
+            <div class="process-grid">
+              <div class="process-card">
+                <div class="process-step-num">01</div>
+                <h3 class="process-step-title">Scan</h3>
+                <p class="process-step-desc">
+                  Point your smartphone camera at the standardized Hiro marker to anchor high-precision 3D skincare objects directly in physical space.
+                </p>
+              </div>
+
+              <div class="process-card">
+                <div class="process-step-num">02</div>
+                <h3 class="process-step-title">Explore</h3>
+                <p class="process-step-desc">
+                  Orbit around realistic packaging architecture, inspect microscopic lipid matrices, and interact with live chemical molecular models.
+                </p>
+              </div>
+
+              <div class="process-card">
+                <div class="process-step-num">03</div>
+                <h3 class="process-step-title">Understand</h3>
+                <p class="process-step-desc">
+                  Gain genuine formulation knowledge: pH balance, optimal percentages, lipid ratios, and cellular mechanisms that truly nourish skin.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 2: EXPLORE PRODUCTS
+           ========================================== -->
+      <section class="view-section" id="view-products">
+        <div class="container products-section">
+          <div style="margin-bottom: 2rem;">
+            <span class="section-kicker">Educational Formulation Directory</span>
+            <h2 class="section-title" style="margin-top: 0.25rem;">Skincare Products</h2>
+            <p class="section-subtitle" style="margin: 0.5rem 0 0 0; text-align: left;">
+              Select a product to study its ingredient profile, lipid preservation mechanics, and 3D Augmented Reality visualization.
+            </p>
+          </div>
+
+          <!-- Interactive Filter Tabs -->
+          <div class="filter-bar">
+            <button class="filter-tab active" data-filter="all">All Formulations</button>
+            <button class="filter-tab" data-filter="cleanser">Cleansers</button>
+            <button class="filter-tab" data-filter="serum">Serums</button>
+            <button class="filter-tab" data-filter="moisturizer">Moisturizers</button>
+          </div>
+
+          <!-- Products Grid -->
+          <div class="product-grid" id="product-grid">
+            <!-- Dynamically populated by products.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 3: PRODUCT DETAIL
+           ========================================== -->
+      <section class="view-section" id="view-product-detail">
+        <div class="container product-detail-view" id="product-detail-content">
+          <!-- Dynamically populated on item selection -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 4: INGREDIENT LAB
+           ========================================== -->
+      <section class="view-section" id="view-ingredients">
+        <div class="container ingredient-lab-section">
+          <div style="margin-bottom: 2.5rem;">
+            <span class="section-kicker">Molecular Science</span>
+            <h2 class="section-title" style="margin-top: 0.25rem;">Ingredient Lab</h2>
+            <p class="section-subtitle" style="margin: 0.5rem 0 0 0; text-align: left;">
+              Beginner-friendly breakdowns of foundational skincare actives. Explore active molecules to understand how they function, hydrate, and nourish skin.
+            </p>
+          </div>
+
+          <!-- Ingredients Grid -->
+          <div class="ingredient-grid" id="ingredient-grid">
+            <!-- Dynamically populated by ingredients.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW: INGREDIENT DETAIL
+           ========================================== -->
+      <section class="view-section" id="view-ingredient-detail">
+        <div class="container product-detail-view" id="ingredient-detail-content">
+          <!-- Dynamically populated on ingredient selection -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 5: ABOUT
+           ========================================== -->
+      <section class="view-section" id="view-about">
+        <div class="container about-section">
+          <div class="about-grid">
+            <div class="about-prose">
+              <span class="section-kicker">Our Mission</span>
+              <h2 class="section-title">Demystifying Skincare Through Spatial Computing</h2>
+              <p>
+                SkinSpace AR was founded on a simple conviction: skincare consumers deserve objective, science-based clarity rather than opaque marketing claims and miracle promises.
+              </p>
+              <p>
+                By combining Web AR standards with dermatological science, SkinSpace bridges the gap between ingredient lists and biological function. You can physically observe how humectants bond with water molecules and how ceramides interlock to form the stratum corneum barrier.
+              </p>
+              <div style="padding-top: 1rem; border-top: 1px solid var(--color-border);">
+                <h3 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">How Web AR Marker Tracking Works</h3>
+                <p style="font-size: 0.9375rem; color: var(--color-text-secondary);">
+                  SkinSpace utilizes high-contrast fiducial markers (the standardized Hiro pattern) with computer vision edge detection. When your smartphone camera detects the dark border and geometric matrix, it computes the exact 6-degree-of-freedom (6DOF) spatial pose, anchoring 3D models seamlessly to your real table or desk without requiring app store downloads.
+                </p>
+              </div>
+            </div>
+
+            <div class="about-marker-box">
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem;">The SkinSpace AR Marker</h3>
+                <p style="font-size: 0.875rem; color: var(--color-text-secondary);">
+                  Display this marker on your computer monitor or print it out to scan using your phone camera.
+                </p>
+              </div>
+              <div class="marker-preview-frame">
+                <img src="/assets/markers/hiro-marker.png" alt="Standard Hiro AR Marker" />
+              </div>
+              <div style="display: flex; gap: 0.75rem; justify-content: center;">
+                <button class="btn-primary btn-open-marker-modal">
+                  Open Fullscreen Marker
+                </button>
+                <a href="/assets/markers/hiro-marker.png" download="skinspace-hiro-marker.png" class="btn-secondary">
+                  Download PNG
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+    
+    
+<!-- Guided Scanner Card: place after .ar-top-bar -->
+<div class="ar-scan-guide" id="ar-scan-guide" role="status" aria-live="polite" hidden>
+  <img
+    class="ar-scan-guide-image"
+    id="ar-scan-guide-image"
+    src="/assets/markers/hiro-marker.png"
+    alt="Hiro marker to scan"
+  />
+  <div class="ar-scan-guide-copy">
+    <span class="ar-scan-guide-eyebrow" id="ar-scan-guide-eyebrow"></span>
+    <strong class="ar-scan-guide-title" id="ar-scan-guide-title"></strong>
+    <p class="ar-scan-guide-message" id="ar-scan-guide-message"></p>
+  </div>
+</div>
+
+    
+
+
+    <!-- ==========================================
+         VIEW 6: AR SCANNER VIEWPORT (MOBILE FIRST)
+         ========================================== -->
+    <div class="ar-scanner-viewport" id="ar-scanner-viewport">
+      <!-- A-Frame Web AR Scene mounted here -->
+      <div id="ar-scene-container"></div>
+
+      <!-- AR HUD Controls & Overlay -->
+      <div class="ar-hud-overlay">
+        <!-- TOP: Back / Exit AR + Minimal Status -->
+        <div class="ar-top-bar">
+          <button class="ar-hud-btn" id="ar-back-btn" aria-label="Exit AR Scanner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Exit AR
+          </button>
+
+          <!-- Minimal Status Indicator -->
+          <div class="ar-status-badge" id="ar-status-badge">
+            <span class="status-dot scanning"></span>
+            <span class="status-text">READY</span>
+          </div>
+        </div>
+
+        <!-- CENTER: Scanner Reticle Frame (Fades out when marker detected) -->
+        <div class="ar-reticle-container" id="ar-reticle-container">
+          <div class="ar-reticle-box">
+            <div class="corner-bracket corner-tl"></div>
+            <div class="corner-bracket corner-tr"></div>
+            <div class="corner-bracket corner-bl"></div>
+            <div class="corner-bracket corner-br"></div>
+          </div>
+        </div>
+
+        <!-- BOTTOM: Short Scanning Instruction -->
+        <div class="ar-instruction-pill" id="ar-instruction-pill">
+          Point camera at Hiro marker
+        </div>
+
+        <!-- Educational Hotspot for Hyaluronic Acid AR Molecule -->
+        <button class="ar-molecule-hotspot-btn hidden" id="ar-molecule-hotspot" aria-label="Explore Hydration Hotspot" title="Explore Hydration Hotspot">
+          <span class="hotspot-beacon-pulse"></span>
+          <span class="hotspot-beacon-core"></span>
+          <span class="hotspot-badge-text">Hydration</span>
+        </button>
+
+        <!-- Educational Explanation Card for Hotspot -->
+        <div class="ar-hotspot-card hidden" id="ar-hotspot-card" role="region" aria-label="Hydration Hotspot Details">
+          <div class="ar-hotspot-header">
+            <div class="ar-hotspot-title-group">
+              <span class="ar-hotspot-tag">Hydration</span>
+              <h5 class="ar-hotspot-title">Active Moisture Binding</h5>
+            </div>
+            <button class="ar-hotspot-close-btn" id="ar-hotspot-close-btn" aria-label="Close explanation" title="Close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <p class="ar-hotspot-desc">
+            Hyaluronic Acid is a humectant that attracts and helps retain water, supporting skin hydration.
+          </p>
+        </div>
+
+        <!-- Small circular action/info button near 3D product -->
+        <button class="ar-product-action-btn hidden" id="ar-product-info-btn" aria-label="View information" title="View information">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </button>
+
+        <!-- Bottom Educational Drawer (Expands on info button tap) -->
+        <div class="ar-bottom-drawer collapsed" id="ar-bottom-drawer">
+          <div class="drawer-drag-handle" aria-hidden="true"></div>
+          <div class="drawer-header">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;">
+              <h4 class="drawer-title" id="ar-drawer-title"></h4>
+              <span class="drawer-category-badge" id="ar-drawer-category"></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="drawer-status-pill">
+                Detected
+              </span>
+              <button class="drawer-close-btn" id="ar-drawer-close-btn" aria-label="Close information" title="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="drawer-content" id="ar-drawer-content">
+            <div class="drawer-section">
+              <span class="drawer-label">Description</span>
+              <p class="drawer-desc" id="ar-drawer-desc"></p>
+            </div>
+
+            <div class="drawer-section">
+              <span class="drawer-label">Benefits</span>
+              <ul class="drawer-benefits" id="ar-drawer-benefits"></ul>
+            </div>
+
+            <div class="drawer-grid">
+              <div>
+                <span class="drawer-label">Suitable for</span>
+                <p class="drawer-val" id="ar-drawer-skintypes"></p>
+              </div>
+              <div>
+                <span class="drawer-label">Key ingredients</span>
+                <p class="drawer-val" id="ar-drawer-ingredients"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Permission / Hardware Error Screen -->
+        <div class="ar-permission-error-card" id="ar-permission-error">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: #EF4444;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+              <line x1="2" y1="2" x2="22" y2="22"/>
+            </svg>
+          </div>
+          <div class="ar-permission-title">Camera Access Required</div>
+          <p class="ar-permission-desc">
+            Camera access is required to use SkinSpace AR. Please grant camera permission in your browser or switch to the interactive 3D Sandbox mode.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <button class="btn-primary" id="ar-retry-camera-btn">
+              Retry Camera Access
+            </button>
+            <button class="btn-secondary" id="ar-fallback-sandbox-btn" style="background: rgba(255,255,255,0.1); color: #FFF; border-color: rgba(255,255,255,0.2);">
+              Switch to Interactive 3D Sandbox Mode
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         HIRO AR MARKER MODAL
+         ========================================== -->
+    <div class="modal-backdrop" id="marker-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3 class="modal-title">SkinSpace AR Marker</h3>
+          <button class="modal-close-btn" id="close-marker-modal-btn" aria-label="Close Marker Dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size: 0.875rem; color: var(--color-text-secondary);">
+            Point your smartphone camera at this marker to anchor products and ingredients in 3D Web AR.
+          </p>
+          <div class="modal-marker-display">
+            <img src="/assets/markers/hiro-marker.png" alt="Canonical Hiro AR Marker" />
+          </div>
+          <p style="font-size: 0.8125rem; color: var(--color-text-muted);">
+            Pro-tip: If you're on a phone, open this page on a laptop or tablet and aim your phone camera at the screen!
+          </p>
+        </div>
+        <div class="modal-footer">
+          <a href="/assets/markers/hiro-marker.png" download="skinspace-hiro-marker.png" class="btn-secondary">
+            Download PNG
+          </a>
+          <button class="btn-primary" id="print-marker-btn">
+            Print Marker
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <a href="#home" class="brand-mark" style="font-size: 1.25rem;">
+              SkinSpace <span>AR</span>
+            </a>
+            <p class="footer-desc">
+              An educational skincare Web AR application designed to explore products and understand active ingredients through spatial computing.
+            </p>
+          </div>
+
+          <div>
+            <div class="footer-col-title">Navigation</div>
+            <ul class="footer-links">
+              <li><a href="#home">Home</a></li>
+              <li><a href="#products">Explore Products</a></li>
+              <!-- <li><a href="#ingredients">Ingredient Lab</a></li> -->
+              <li><a href="#about">About & Marker Science</a></li>
+            </ul>
+          </div>
+
+          <!-- <div>
+            <div class="footer-col-title">AR Resources</div>
+            <ul class="footer-links">
+              <li><a href="#" class="btn-open-marker-modal">View Hiro Marker</a></li>
+              <li><a href="/assets/markers/hiro-marker.svg" download="skinspace-hiro-marker.svg">Download Printable Marker</a></li>
+              <li><a href="#ar-scanner/product:hydrating-serum">Launch Hydrating Serum AR</a></li>
+              <li><a href="#ar-scanner/ingredient:niacinamide">Launch Niacinamide AR</a></li>
+            </ul>
+          </div> -->
+        </div>
+
+        <div class="footer-bottom">
+          <div>
+            © 2026 SkinSpace AR. Educational skincare platform. No medical diagnosis or claims.
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.75rem;">
+            A-FRAME · AR.JS · WEBCAM 6DOF
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Main JavaScript App -->
+    <script type="module" src="/src/js/app.js"></script>
+  </body>
+</html>

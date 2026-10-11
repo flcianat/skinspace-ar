@@ -1,0 +1,1208 @@
+/* ==========================================================================
+   SkinSpace AR · Responsive & Mobile AR Viewport Styles
+   Mobile-first camera viewport math, aspect ratio preservation, touch targets
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. AR Scanner Viewport Architecture
+   -------------------------------------------------------------------------- */
+.ar-scanner-viewport {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height to prevent mobile browser URL bar jump */
+  background: transparent !important; /* CRITICAL: Transparent background so live camera video is visible */
+  z-index: 1000;
+  overflow: hidden;
+  display: none;
+}
+
+.ar-scanner-viewport.active {
+  display: block;
+}
+
+/* A-Frame scene container inside scanner */
+#ar-scene-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent !important;
+  z-index: 1;
+}
+
+/* Ensure AR.js webcam video feeds are always visible and cover viewport */
+#ar-scene-container video,
+video#arjs-video,
+body > video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  z-index: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+/* A-Frame scene and 3D canvas must be transparent and sit on top of video */
+a-scene {
+  background: transparent !important;
+}
+
+.a-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  z-index: 2 !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. AR Scanner HUD & Controls (z-index 10)
+   -------------------------------------------------------------------------- */
+.ar-hud-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: env(safe-area-inset-top, 1rem) env(safe-area-inset-right, 1rem) env(safe-area-inset-bottom, 1rem) env(safe-area-inset-left, 1rem);
+}
+
+.ar-hud-overlay button,
+.ar-hud-overlay a,
+.ar-hud-btn,
+.ar-bottom-drawer,
+.ar-permission-error-card {
+  pointer-events: auto !important;
+}
+
+/* Top bar of AR Scanner */
+.ar-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.5rem;
+}
+
+.ar-hud-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 0.875rem;
+  background: rgba(18, 22, 19, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-full);
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.ar-hud-btn:hover {
+  background: rgba(28, 34, 30, 0.9);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Live AR Status Indicator */
+.ar-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-full);
+  background: rgba(18, 22, 19, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #9CA3AF;
+  transition: background-color var(--transition-fast);
+}
+
+.status-dot.initializing {
+  background-color: #38BDF8;
+  box-shadow: 0 0 8px #38BDF8;
+}
+
+.status-dot.scanning {
+  background-color: #FBBF24;
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+.status-dot.detected {
+  background-color: #22C55E;
+  box-shadow: 0 0 8px #22C55E;
+}
+
+.status-dot.lost {
+  background-color: #F97316;
+}
+
+.status-dot.error {
+  background-color: #EF4444;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* --------------------------------------------------------------------------
+   3. Reticle & Scanner Frame
+   -------------------------------------------------------------------------- */
+.ar-reticle-container,
+.ar-reticle-container * {
+  pointer-events: none !important;
+}
+
+.ar-reticle-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(72vw, 280px);
+  height: min(72vw, 280px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+  z-index: 5;
+}
+
+.ar-reticle-box {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 9999px rgba(10, 13, 11, 0.35); /* Subtle dark focus mask */
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+/* Animated Corner Brackets */
+.corner-bracket {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: #FFFFFF;
+  border-style: solid;
+  transition: border-color var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+.corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+.corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+.corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
+/* When marker is detected: prioritize 3D model, fade out dark mask */
+.ar-reticle-container.detected {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.ar-reticle-container.lost .corner-bracket {
+  border-color: #F97316;
+}
+
+/* --------------------------------------------------------------------------
+   4. Floating Educational AR Bottom Card / Drawer & Action Button
+   -------------------------------------------------------------------------- */
+
+/* BOTTOM: Short Scanning Instruction */
+.ar-instruction-pill {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 1rem) + 1.25rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(18, 22, 19, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--radius-full);
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: normal;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 2.5rem));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  text-align: center;
+  line-height: 1.35;
+  transition: all var(--transition-smooth);
+  z-index: 20;
+  pointer-events: auto;
+}
+
+/* NEAR PRODUCT: Info Button */
+.ar-product-action-btn {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 1rem) + 4.25rem);
+  left: 50%;
+  transform: translateX(-50%) scale(1);
+  width: 48px;
+  height: 48px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  background: #182C22;
+  color: #FFFFFF;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(78, 142, 114, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  pointer-events: auto;
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast);
+  animation: pulse-action-btn 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse-action-btn {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(78, 142, 114, 0.35);
+  }
+  50% {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), 0 0 0 7px rgba(78, 142, 114, 0.55);
+  }
+}
+
+.ar-product-action-btn:hover {
+  background: #254234;
+  transform: translateX(-50%) scale(1.08);
+}
+
+.ar-product-action-btn:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+.ar-product-action-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) scale(0.7);
+}
+
+/* Bottom Educational Drawer (Compact Bottom Sheet) */
+.ar-bottom-drawer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  max-height: 60vh;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-bottom: none;
+  padding: 0.75rem 1.125rem calc(env(safe-area-inset-bottom, 1rem) + 0.875rem);
+  box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 30;
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  overflow: hidden;
+}
+
+.ar-bottom-drawer.collapsed {
+  transform: translateY(105%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Drag handle notch */
+.drawer-drag-handle {
+  width: 38px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.18);
+  margin: 0 auto 0.25rem;
+  flex-shrink: 0;
+}
+
+/* Drawer Header */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.drawer-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.drawer-category-badge {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  background: var(--color-surface-subtle);
+  color: var(--color-accent);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+}
+
+.drawer-status-pill {
+  font-size: 0.725rem;
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+/* Close button inside educational drawer: ~44px touch area */
+.drawer-close-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.drawer-close-btn:hover {
+  background: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.drawer-close-btn:active {
+  transform: scale(0.92);
+}
+
+/* Scrollable content area: max-height leaves camera/product visible above */
+.drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: calc(60vh - 90px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 0.35rem;
+  overscroll-behavior: contain;
+}
+
+.drawer-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.drawer-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.drawer-label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.drawer-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.drawer-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.drawer-benefits li {
+  font-size: 0.8125rem;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.drawer-benefits li::before {
+  content: "•";
+  position: absolute;
+  left: 0.15rem;
+  color: var(--color-accent);
+  font-weight: bold;
+}
+
+.drawer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.drawer-val {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* --------------------------------------------------------------------------
+   5. Camera Error / Permission Screen
+   -------------------------------------------------------------------------- */
+.ar-permission-error-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(18, 22, 19, 0.94);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  display: none;
+  flex-direction: column;
+  gap: 1.25rem;
+  z-index: 30;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  color: #FFFFFF;
+}
+
+.ar-permission-error-card.active {
+  display: flex;
+}
+
+.ar-permission-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.ar-permission-desc {
+  font-size: 0.9375rem;
+  color: #D1D5DB;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   6. General Responsive Breakpoints
+/* --------------------------------------------------------------------------
+   6. General Responsive Breakpoints & Mobile Polish (320px–430px Contract)
+   -------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .hero-grid,
+  .product-detail-layout,
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .process-grid,
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --nav-height: 64px;
+  }
+
+  .site-header {
+    height: var(--nav-height);
+  }
+
+  .header-actions .btn-secondary {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 0.45rem;
+  }
+
+  .header-actions .btn-primary {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    min-height: 44px;
+    gap: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+  }
+
+  .brand-mark {
+    font-size: 1.25rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .brand-mark span {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.35rem;
+    background: var(--color-accent-light);
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-menu {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--color-border);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.875rem 1rem 1.25rem;
+    gap: 0.35rem;
+    display: none;
+    box-shadow: var(--shadow-overlay);
+    z-index: 49;
+    max-height: calc(100dvh - var(--nav-height));
+    overflow-y: auto;
+  }
+
+  .nav-menu.mobile-open {
+    display: flex;
+    animation: slideDownNav 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .nav-link {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    padding: 0.75rem 1rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-link:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-hover);
+  }
+
+  .nav-link.active {
+    color: var(--color-accent);
+    background-color: var(--color-accent-light);
+    font-weight: 600;
+  }
+
+  .nav-link.active::after {
+    display: none;
+  }
+
+  .mobile-only-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-top: 1px solid var(--color-border);
+    margin-top: 0.35rem;
+    padding: 0.75rem 1rem;
+    min-height: 44px;
+    color: var(--color-accent);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  /* Product Explorer Section */
+  .products-section {
+    padding: 2.25rem 0 3.5rem;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    width: 100%;
+  }
+
+  .product-card-body {
+    padding: 1.25rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .product-title {
+    font-size: 1.25rem;
+  }
+
+  .product-desc {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .product-card-footer {
+    padding: 0.875rem 1rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .product-card-footer .btn-secondary,
+  .product-card-footer .btn-primary {
+    flex: 1;
+    min-height: 44px;
+    justify-content: center;
+    font-size: 0.8125rem;
+    padding: 0.5rem 0.5rem;
+  }
+
+  /* Product Detail Mobile Hierarchy (Scan Order: Back -> Title/Category -> Visual -> Desc -> Benefits -> Suitable -> Ingredients -> Try AR) */
+  .product-detail-view {
+    padding: 1.25rem 0 3.5rem;
+  }
+
+  .breadcrumb-nav {
+    margin-bottom: 1.25rem;
+  }
+
+  .breadcrumb-back-link {
+    min-height: 44px;
+    font-size: 0.875rem;
+  }
+
+  .product-detail-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .product-detail-header-block {
+    order: 1;
+  }
+
+  .product-detail-visual-col {
+    order: 2;
+    width: 100%;
+  }
+
+  .product-detail-media-card {
+    position: static;
+    border-radius: var(--radius-lg);
+  }
+
+  .product-detail-media-card img {
+    aspect-ratio: 16 / 11;
+  }
+
+  .product-detail-info {
+    order: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .product-detail-title {
+    font-size: clamp(1.65rem, 6vw, 2.15rem);
+    line-height: 1.2;
+  }
+
+  .product-detail-desc {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .detail-section {
+    gap: 0.65rem;
+  }
+
+  .detail-section-title {
+    font-size: 1.05rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .detail-list li {
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .skin-type-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.55rem;
+  }
+
+  .ingredient-chip-btn {
+    min-height: 44px;
+    font-size: 0.8125rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .ar-experience-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.35rem 1.125rem;
+    gap: 1.25rem;
+  }
+
+  .ar-experience-marker-wrapper {
+    width: 100%;
+    align-items: center;
+  }
+
+  .ar-experience-marker-frame {
+    width: 140px;
+    height: 140px;
+    padding: 12px;
+  }
+
+  .ar-experience-content {
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .ar-experience-instruction {
+    font-size: 0.9375rem;
+  }
+
+  .ar-experience-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .ar-experience-actions .btn-launch-detail-ar,
+  .ar-experience-actions .btn-download-marker {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+  }
+
+  /* Section Padding Optimization */
+  .hero-section {
+    padding: 2.75rem 0 2rem;
+  }
+
+  .process-section,
+  .ingredient-lab-section,
+  .about-section {
+    padding: 2.5rem 0 3rem;
+  }
+
+  .hero-headline {
+    font-size: clamp(2rem, 7vw, 2.75rem);
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .hero-cta-group .btn-primary,
+  .hero-cta-group .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ingredient-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@keyframes slideDownNav {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Specific optimizations for portrait phones (320px–430px) */
+@media (max-width: 480px) {
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.65rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.9375rem;
+  }
+
+  .process-card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .product-card-body {
+    padding: 1.25rem 1rem;
+  }
+
+  .product-card-footer {
+    padding: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .ingredient-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .about-marker-box {
+    padding: 1.25rem 1rem;
+  }
+
+  .modal-dialog {
+    width: 100%;
+    margin: 0.75rem auto;
+  }
+
+  .modal-body {
+    padding: 1.25rem 1rem;
+  }
+
+  .modal-marker-display {
+    max-width: 100%;
+    padding: 0.75rem;
+  }
+
+  .modal-marker-display img {
+    max-width: 100%;
+    width: 200px;
+    height: 200px;
+  }
+
+  /* AR HUD Mobile Constraints */
+  .ar-hud-overlay {
+    padding: env(safe-area-inset-top, 0.75rem) 0.75rem env(safe-area-inset-bottom, 0.75rem) 0.75rem;
+  }
+
+  .ar-top-bar {
+    padding: 0.5rem 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ar-hud-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8125rem;
+  }
+
+  .ar-status-badge {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .ar-product-action-btn {
+    width: 48px;
+    height: 48px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .ar-bottom-drawer {
+    width: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: 0.75rem 1rem calc(env(safe-area-inset-bottom, 1rem) + 0.75rem);
+    max-height: 60vh;
+  }
+
+  .drawer-close-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .drawer-title {
+    font-size: 1.05rem;
+  }
+
+  .drawer-content {
+    max-height: calc(60vh - 85px);
+  }
+
+  .site-footer {
+    padding: 2.25rem 0 1.5rem;
+  }
+
+  .footer-grid {
+    gap: 1.75rem;
+    padding-bottom: 1.75rem;
+  }
+}
+
+/* Extra small portrait phones (320px–360px: e.g. iPhone SE 1st gen, small Androids) */
+@media (max-width: 360px) {
+  .hero-headline {
+    font-size: 1.75rem;
+  }
+
+  .hero-description {
+    font-size: 0.9375rem;
+  }
+
+  .brand-mark {
+    font-size: 1.125rem;
+    gap: 0.3rem;
+  }
+
+  .brand-mark span {
+    font-size: 0.7rem;
+    padding: 0.08rem 0.28rem;
+    display: inline-block;
+  }
+
+  .header-actions .btn-primary {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .drawer-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .product-card-body {
+    padding: 1rem 0.875rem;
+    gap: 0.6rem;
+  }
+
+  .product-title {
+    font-size: 1.15rem;
+  }
+
+  .product-card-footer {
+    padding: 0.75rem 0.875rem;
+    gap: 0.4rem;
+  }
+
+  .product-card-footer .btn-secondary,
+  .product-card-footer .btn-primary {
+    font-size: 0.75rem;
+    padding: 0.45rem 0.35rem;
+  }
+
+  .product-detail-title {
+    font-size: 1.5rem;
+  }
+
+  .ar-experience-card {
+    padding: 1.125rem 0.875rem;
+    gap: 1rem;
+  }
+
+  .ar-experience-marker-frame {
+    width: 120px;
+    height: 120px;
+    padding: 10px;
+  }
+
+  .ar-experience-instruction {
+    font-size: 0.875rem;
+  }
+
+  .ar-experience-subhint {
+    font-size: 0.75rem;
+  }
+
+  .hero-visual-badge {
+    padding: 0.6rem 0.75rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0.5rem;
+  }
+
+  .modal-marker-display img {
+    width: 170px;
+    height: 170px;
+  }
+}
+
+/* Safe area support for mobile phones */
+@supports (padding: env(safe-area-inset-top)) {
+  .site-header {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+
+/* Guided Product Scanner */
+.ar-scan-guide {
+  position: absolute;
+  top: 76px;
+  left: 16px;
+  right: 16px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  background: rgba(20, 25, 23, 0.88);
+  color: #fff;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+.ar-scan-guide-image {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  object-fit: contain;
+  padding: 4px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.ar-scan-guide-copy {
+  min-width: 0;
+}
+
+.ar-scan-guide-eyebrow {
+  display: block;
+  margin-bottom: 3px;
+  color: #b8d6c5;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+
+.ar-scan-guide-title {
+  display: block;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.ar-scan-guide-message {
+  margin: 3px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.ar-scan-guide.is-detected {
+  border-color: rgba(184, 214, 197, 0.5);
+}
+
+@media (max-width: 480px) {
+  .ar-scan-guide {
+    top: 70px;
+    left: 12px;
+    right: 12px;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .ar-scan-guide-image {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+
+  .ar-scan-guide-title {
+    font-size: 0.84rem;
+  }
+
+  .ar-scan-guide-message {
+    font-size: 0.7rem;
+  }
+}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" fill="#FFFFFF"/>
+  <!-- Black border (25% border ratio) -->
+  <rect x="50" y="50" width="400" height="400" fill="#000000"/>
+  <!-- Inner White Region -->
+  <rect x="125" y="125" width="250" height="250" fill="#FFFFFF"/>
+  <!-- 3x3 Matrix Binary Grid for Barcode Marker #2 -->
+  <!-- 3x3 grid inside 250x250: each cell is 83.33 x 83.33 -->
+  <!-- Top Row (0,0) (0,1) (0,2) -->
+  <rect x="130" y="130" width="75" height="75" fill="#000000"/>
+  <rect x="295" y="130" width="75" height="75" fill="#000000"/>
+  <!-- Center Row: (1,1) active -->
+  <rect x="212.5" y="212.5" width="75" height="75" fill="#000000"/>
+  <!-- Bottom Row: (2,0) (2,1) (2,2) -->
+  <rect x="130" y="295" width="75" height="75" fill="#000000"/>
+  <rect x="212.5" y="295" width="75" height="75" fill="#000000"/>
+</svg>

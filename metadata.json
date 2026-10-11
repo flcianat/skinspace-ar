@@ -1,0 +1,10 @@
+{
+  "name": "SkinSpace AR",
+  "description": "Educational skincare Web AR application to explore products and learn about ingredients in 3D and Augmented Reality.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

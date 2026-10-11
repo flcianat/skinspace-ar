@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" fill="#FFFFFF"/>
+  <!-- Black border (25% border ratio) -->
+  <rect x="50" y="50" width="400" height="400" fill="#000000"/>
+  <!-- Inner White Region -->
+  <rect x="125" y="125" width="250" height="250" fill="#FFFFFF"/>
+  <!-- Hiro Pattern Center Glyph -->
+  <path d="M175 160 H210 V230 H290 V160 H325 V340 H290 V270 H210 V340 H175 Z" fill="#000000"/>
+  <!-- Top/Bottom Accents for Hiro geometry -->
+  <rect x="235" y="175" width="30" height="20" fill="#000000"/>
+  <rect x="235" y="305" width="30" height="20" fill="#000000"/>
+</svg>
